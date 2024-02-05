@@ -77,8 +77,8 @@ class PublicUserAPITests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_token_invalid_credentials(self):
-        create_user(email='testl@example.com', password='testpass123')
-        payload = {'email': 'testl@example.com', 'password': 'wrongpass'}
+        create_user(email='test@example.com', password='testpass123')
+        payload = {'email': 'test@example.com', 'password': 'wrongpass'}
 
         response = self.client.post(TOKEN_URL, payload)
 
@@ -112,14 +112,17 @@ class PrivateUserAPITests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
-            'email':self.user.email,
+            'email': self.user.email,
             'name': self.user.name,
         })
 
     def test_me_post_not_allowed(self):
         response = self.client.post(ME_URL, {})
 
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
 
     def test_update_user(self):
         payload = {'name': 'New Name', 'password': 'newpassword123'}
