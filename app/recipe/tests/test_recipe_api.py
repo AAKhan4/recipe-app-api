@@ -36,6 +36,10 @@ def create_recipe(user, **params):
     return recipe
 
 
+def create_user(**params):
+    return get_user_model().objects.create_user(**params)
+
+
 class PublicRecipeAPITests(TestCase):
     def setUp(self):
         self.client = APIClient()
@@ -49,9 +53,9 @@ class PublicRecipeAPITests(TestCase):
 class PrivateRecipeAPITests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            'test@example.com',
-            'testpass123',
+        self.user = create_user(
+            email='test@example.com',
+            password='testpass123',
         )
         self.client.force_authenticate(self.user)
 
@@ -68,9 +72,9 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_recipes_limited_to_user(self):
-        other_user = get_user_model().objects.create_user(
-            'test2@example.com',
-            'testpass1234',
+        other_user = create_user(
+            email='test2@example.com',
+            password='testpass1234',
         )
         create_recipe(user=other_user)
         create_recipe(user=self.user)
@@ -105,3 +109,82 @@ class PrivateRecipeAPITests(TestCase):
         for key, value in payload.items():
             self.assertEqual(getattr(recipe, key), value)
         self.assertEqual(recipe.user, self.user)
+
+    def test_partial_update(self):
+        og_link = 'https://example.com/recipe.pdf'
+        recipe = create_recipe(
+            user=self.user,
+            title='Sample Title',
+            link=og_link
+        )
+
+        payload = {'title': 'New Title'}
+        url = detail_url(recipe.id)
+        response = self.client.patch(url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.title, payload['title'])
+        self.assertEqual(recipe.link, og_link)
+        self.assertEqual(recipe.user, self.user)
+
+    def test_full_update(self):
+        recipe = create_recipe(
+            user=self.user,
+            title='Sample Title',
+            link='https://example.com/recipe.pdf',
+            description='sample description.',
+        )
+
+        payload = {
+            'title': 'New Title',
+            'link': 'https://example.com/new-link.pdf',
+            'description': 'new sample description.',
+            'time_mins': 5,
+            'price': Decimal('4.99'),
+        }
+        url = detail_url(recipe.id)
+        response = self.client.put(url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        recipe.refresh_from_db()
+        for key, value in payload.items():
+            self.assertEqual(getattr(recipe, key), value)
+        self.assertEqual(recipe.user, self.user)
+
+    def test_update_user_error(self):
+        """Test change recipe user result error"""
+        new_user = create_user(
+            email='user@example.com',
+            password='testpass123',
+        )
+        recipe = create_recipe(user=self.user)
+
+        payload = {'user': new_user.id}
+        url = detail_url(recipe.id)
+        self.client.patch(url, payload)
+        recipe.refresh_from_db()
+
+        self.assertEqual(recipe.user, self.user)
+
+    def test_delete_recipe(self):
+        recipe = create_recipe(user=self.user)
+
+        url = detail_url(recipe.id)
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Recipe.objects.filter(id=recipe.id).exists())
+
+    def test_delete_other_user_recipe_error(self):
+        new_user = create_user(
+            email='user@example.com',
+            password='testpass123',
+        )
+        recipe = create_recipe(user=new_user)
+
+        url = detail_url(recipe.id)
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Recipe.objects.filter(id=recipe.id).exists())
