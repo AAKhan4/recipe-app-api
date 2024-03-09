@@ -18,6 +18,11 @@ def create_user(email='user@example.com', password='Testpass123.'):
     return get_user_model().objects.create_user(email=email, password=password)
 
 
+def detail_url(tag_id):
+    '''Return tag detail URL'''
+    return reverse('recipe:tag-detail', args=[tag_id])
+
+
 class PublicTagApiTests(TestCase):
     '''Test unauth tags API'''
 
@@ -62,3 +67,24 @@ class PrivateTagApiTests(TestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['name'], tag.name)
         self.assertEqual(response.data[0]['id'], tag.id)
+
+    def test_update_tag(self):
+        '''Test updating tag'''
+        tag = Tag.objects.create(user=self.user, name='AfterDinner')
+        payload = {'name': 'Dessert'}
+        url = detail_url(tag.id)
+        response = self.client.patch(url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        tag.refresh_from_db()
+        self.assertEqual(tag.name, payload.get('name'))
+
+    def test_delete_tag(self):
+        '''Test deleting tag'''
+        tag = Tag.objects.create(user=self.user, name='Breakfast')
+        url = detail_url(tag.id)
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        tag = Tag.objects.filter(user=self.user)
+        self.assertFalse(tag.exists())
