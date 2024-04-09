@@ -45,8 +45,7 @@ class IngredientViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
     mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin
-    ):
+    mixins.DestroyModelMixin):
     '''Manage Ingredients in DB'''
     serializer_class = serializers.IngredientSerializer
     queryset = Ingredient.objects.all()
