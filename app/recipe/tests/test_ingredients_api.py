@@ -48,7 +48,7 @@ class PrivateIngredientsAPITests(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_ingredients_limited_to_user(self):
-        user2 = create_user()
+        user2 = create_user(email='test2@example.com')
         Ingredient.objects.create(user=user2, name='Vinegar')
         ingredient = Ingredient.objects.create(user=self.user, name='Tumeric')
 
