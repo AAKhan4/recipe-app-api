@@ -8,10 +8,10 @@ services:
     volumes:
       - static-data:/vol/web
     environment:
-      - DBHOST=db
-      - DBNAME=${DBNAME}
-      - DBUSER=${DBUSER}
-      - DBPASS=${DBPASS}
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
       - SECRET_KEY=${DJANGO_SECRET_KEY}
       - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
     depends_on:
@@ -21,9 +21,9 @@ services:
     image: postgres:13-alpine
     restart: always
     environment:
-      - POSTGRES_DB=${DBNAME}
-      - POSTGRES_USER=${DBUSER}
-      - POSTGRES_PASSWORD=${DBPASS}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
@@ -32,9 +32,11 @@ services:
       context: ./proxy
     restart: always
     ports:
-      - "8000:8000"
+      - 8000:8000
     volumes:
       - static-data:/vol/static
+    depends_on:
+      - app
 
 volumes:
   postgres-data:
