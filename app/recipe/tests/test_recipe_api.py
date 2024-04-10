@@ -367,6 +367,44 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.ingredients.count(), 0)
 
+    def test_filter_by_tags(self):
+        r1 = create_recipe(user=self.user, title='Thai Curry')
+        r2 = create_recipe(user=self.user, title='Pasta')
+        tag1 = Tag.objects.create(user=self.user, name='Thai')
+        tag2 = Tag.objects.create(user=self.user, name='Italian')
+        r1.tags.add(tag1)
+        r2.tags.add(tag2)
+        r3 = create_recipe(user=self.user, title='Fish & Chips')
+
+        params = {'tags': f'{tag1.id},{tag2.id}'}
+        response = self.client.get(RECIPES_URL, params)
+
+        serializer1 = RecipeSerializer(r1)
+        serializer2 = RecipeSerializer(r2)
+        serializer3 = RecipeSerializer(r3)
+        self.assertIn(serializer1.data, response.data)
+        self.assertIn(serializer2.data, response.data)
+        self.assertNotIn(serializer3.data, response.data)
+
+    def test_filter_by_ingredients(self):
+        r1 = create_recipe(user=self.user, title='Thai Curry')
+        r2 = create_recipe(user=self.user, title='Pasta')
+        i1 = Ingredient.objects.create(user=self.user, name='Curry Paste')
+        i2 = Ingredient.objects.create(user=self.user, name='Pasta')
+        r1.ingredients.add(i1)
+        r2.ingredients.add(i2)
+        r3 = create_recipe(user=self.user, title='Fish & Chips')
+
+        params = {'ingredients': f'{i1.id},{i2.id}'}
+        response = self.client.get(RECIPES_URL, params)
+
+        serializer1 = RecipeSerializer(r1)
+        serializer2 = RecipeSerializer(r2)
+        serializer3 = RecipeSerializer(r3)
+        self.assertIn(serializer1.data, response.data)
+        self.assertIn(serializer2.data, response.data)
+        self.assertNotIn(serializer3.data, response.data)
+
 
 class ImageUploadTests(TestCase):
     '''Test image upload'''
