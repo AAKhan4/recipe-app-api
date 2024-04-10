@@ -106,7 +106,7 @@ class PrivateTagApiTests(TestCase):
         serializer1 = TagSerializer(tag1)
         serializer2 = TagSerializer(tag2)
         self.assertIn(serializer1.data, response.data)
-        self.assertIn(serializer2.data, response.data)
+        self.assertNotIn(serializer2.data, response.data)
 
     def test_filter_tags_assigned_unique(self):
         tag1 = Tag.objects.create(user=self.user, name='Breakfast')
