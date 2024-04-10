@@ -91,7 +91,7 @@ class PrivateIngredientsAPITests(TestCase):
         recipe = Recipe.objects.create(
             user=self.user,
             title='Apple Crumble',
-            time_minutes=5,
+            time_mins=5,
             price=Decimal('10.00')
         )
         recipe.ingredients.add(i1)
@@ -109,14 +109,14 @@ class PrivateIngredientsAPITests(TestCase):
         recipe1 = Recipe.objects.create(
             user=self.user,
             title='Apple Crumble',
-            time_minutes=5,
+            time_mins=5,
             price=Decimal('10.00')
         )
         recipe1.ingredients.add(i1)
         recipe2 = Recipe.objects.create(
             user=self.user,
             title='Apple Pie',
-            time_minutes=5,
+            time_mins=5,
             price=Decimal('10.00')
         )
         recipe2.ingredients.add(i1)
