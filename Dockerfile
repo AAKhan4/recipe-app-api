@@ -3,10 +3,10 @@ LABEL maintainer=""
 
 ENV PYTHONUNBUFFERED 1
 
-COPY /requirements.txt /tmp/requirements.txt
-COPY /requirements.dev.txt /tmp/requirements.dev.txt
-COPY /scripts /scripts
-COPY /app /app
+COPY ./requirements.txt /tmp/requirements.txt
+COPY ./requirements.dev.txt /tmp/requirements.dev.txt
+COPY ./scripts /scripts
+COPY ./app /app
 WORKDIR /app
 EXPOSE 8000
 
@@ -32,7 +32,7 @@ RUN python -m venv /py && \
     chmod -R 755 /vol && \
     chmod -R +x /scripts
 
-ENV PATH="/py/bin:$PATH"
+ENV PATH="/scripts:/py/bin:$PATH"
 
 USER django-user
 
