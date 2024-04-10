@@ -110,7 +110,7 @@ class BassRecipeAttrViewSet(
         queryset = self.queryset
         if assigned_only:
             queryset = queryset.filter(recipe__isnull=False)
-        return self.queryset.filter(
+        return queryset.filter(
             user=self.request.user
         ).order_by('-name').distinct()
 
