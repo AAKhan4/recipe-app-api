@@ -1,14 +1,14 @@
 # recipe-app-api
-Recipe API Project
+## Recipe API Project
 
-Building a Recipe API following Online Course
-App Handles Users, Recipes, Tags, Ingredients and Images
+##### Building a Recipe API following Online Course
+##### App Handles Users, Recipes, Tags, Ingredients and Images
 
-Technologies Used:
+#### Technologies Used:
 - Python/Django
 - PostgreSQL
 - Docker
 - GitHub Actions (CICD)
 
-Course Followed:
+#### Course Followed:
 https://www.udemy.com/course/django-python-advanced/
