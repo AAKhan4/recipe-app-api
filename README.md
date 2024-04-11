@@ -9,3 +9,6 @@ Technologies Used:
 - PostgreSQL
 - Docker
 - GitHub Actions (CICD)
+
+Course Followed:
+https://www.udemy.com/course/django-python-advanced/
